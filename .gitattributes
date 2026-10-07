@@ -1,0 +1,2 @@
+# Third-party agent skills: exclude from GitHub language stats
+.claude/** linguist-vendored
