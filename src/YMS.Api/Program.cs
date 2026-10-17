@@ -11,6 +11,9 @@ builder.Services.AddApi(builder.Environment);
 
 var app = builder.Build();
 
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+    await app.Services.MigrateDatabaseAsync();
+
 if (app.Environment.IsDevelopment())
     await app.Services.SeedDevelopmentOwnerAsync(app.Configuration);
 

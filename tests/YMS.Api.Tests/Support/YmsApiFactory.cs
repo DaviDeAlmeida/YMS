@@ -12,12 +12,19 @@ using YMS.Infrastructure.Persistence;
 
 namespace YMS.Api.Tests.Support;
 
-public sealed class YmsApiFactory : WebApplicationFactory<Program>
+public sealed class YmsApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    private string? _connectionString;
+
+    public async Task InitializeAsync() => _connectionString = await PostgresServer.NewDatabaseAsync();
+
+    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
-        builder.UseSetting("Database:InMemoryName", $"yms-tests-{Guid.NewGuid()}");
+        builder.UseSetting($"ConnectionStrings:{YmsDbContext.ConnectionStringName}", _connectionString);
+        builder.UseSetting("Database:MigrateOnStartup", "true");
         builder.ConfigureTestServices(services =>
         {
             services.AddAuthentication(TestAuthHandler.SchemeName)

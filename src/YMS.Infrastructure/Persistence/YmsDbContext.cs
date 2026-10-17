@@ -17,18 +17,19 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Batch> Batches => Set<Batch>();
 
+    public const string ConnectionStringName = "Yms";
+
+    /// <summary>PostgreSQL with snake_case columns; shared by the application and the design-time factory used by migrations.</summary>
+    public static DbContextOptionsBuilder Configure(DbContextOptionsBuilder options, string connectionString) =>
+        options
+            .UseNpgsql(connectionString, npgsql => npgsql.EnableRetryOnFailure())
+            .UseSnakeCaseNamingConvention();
+
     // Read through a property so EF evaluates it per query, against this scope's Owner.
     private Guid CurrentOwnerId => ownerContext.OwnerId;
 
     public async Task ExecuteInTransactionAsync(Func<CancellationToken, Task> work, CancellationToken cancellationToken)
     {
-        // The in-memory provider has no transactions; PostgreSQL will get a real one here.
-        if (!Database.IsRelational())
-        {
-            await work(cancellationToken);
-            return;
-        }
-
         await Database.CreateExecutionStrategy().ExecuteAsync(async ct =>
         {
             await using var transaction = await Database.BeginTransactionAsync(ct);

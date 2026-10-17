@@ -7,6 +7,13 @@ namespace YMS.Infrastructure.Persistence;
 
 public static class DevelopmentSeed
 {
+    /// <summary>Applies pending migrations; enabled by <c>Database:MigrateOnStartup</c> (Development and tests).</summary>
+    public static async Task MigrateDatabaseAsync(this IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<YmsDbContext>().Database.MigrateAsync();
+    }
+
     /// <summary>Creates the local Owner named in <c>Development:OwnerId</c>, the one the Development scheme signs requests in as.</summary>
     public static async Task SeedDevelopmentOwnerAsync(this IServiceProvider services, IConfiguration configuration)
     {
