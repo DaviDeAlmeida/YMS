@@ -88,7 +88,7 @@ Iniciada em 2026-10-07. Última atualização em 2026-10-16.
 - **Categoria é plana**, sem hierarquia.
 - **O Produto tem unidade de medida obrigatória.** Não há quantidade por embalagem. Por enquanto, a unidade é fixa em `UN`.
 - **Todas as validações dos endpoints usam FluentValidation**, divididas assim:
-  - Formato da entrada (obrigatório, tamanho, CNPJ, GTIN, EAN principal): validator do FluentValidation na `YMS.Application`.
+  - Formato da entrada (obrigatório, tamanho, CNPJ, EAN principal): validator do FluentValidation na `YMS.Application`.
   - Referências e unicidade, que consultam o banco: validator assíncrono do FluentValidation na `YMS.Application`.
   - Invariantes do agregado (quantidade abaixo do agendado, reenvio de Pedido Cancelado): método do agregado na `YMS.Domain`, que lança uma exceção de domínio; a API a converte em `422`, no mesmo formato.
 - **CQRS com pastas separadas** para Commands e Queries: área → `Commands` ou `Queries` → uma pasta por caso de uso (Command, Handler e Validator juntos).
