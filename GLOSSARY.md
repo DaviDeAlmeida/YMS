@@ -15,17 +15,49 @@ Um armazém do Owner onde as mercadorias são recebidas. Abreviado como CD.
 _Avoid_: Unidade, Armazém, Filial, Site
 
 **Fornecedor** (`Supplier`):
-A empresa, única por CNPJ, que vende mercadorias a um ou mais Owners e as entrega em seus Centros de Distribuição.
-_Avoid_: Vendedor, Parceiro
+Uma empresa cadastrada por um Owner, que vende mercadorias a esse Owner e as entrega em seus Centros de Distribuição. A mesma empresa que vende a dois Owners é um Fornecedor diferente em cada um.
+_Avoid_: Vendedor, Parceiro, Vínculo
 
-**Vínculo** (`SupplierLink`):
-A relação que autoriza um Fornecedor a operar com um Owner; sem Vínculo, o Fornecedor não vê nada daquele Owner.
-_Avoid_: Credenciamento, Associação, Relacionamento
+### Integração
+
+**Lote** (`Batch`):
+Uma requisição da API do Owner com vários registros do mesmo tipo (Categorias, Produtos, Fornecedores ou Pedidos de Compra), processada de forma assíncrona e com resultado item a item.
+_Avoid_: Bulk, Book, Carga, Pacote
+
+### Usuários
+
+Cada usuário tem um único perfil.
+
+**Administrador** (`Admin`):
+O usuário do Owner com maior acesso; cadastra os usuários do Owner e dos Fornecedores e define a Carteira de cada um.
+_Avoid_: Gestor, Master
+
+**Operador logístico** (`LogisticsOperator`):
+O usuário do Owner que aprova, recusa e reagenda Agendamentos.
+_Avoid_: Logística, Aprovador
+
+**Operador de pátio** (`YardOperator`):
+O usuário do Owner que atua na portaria e na doca, marcando a chegada, o início e o fim da descarga.
+_Avoid_: Portaria, Doca, Porteiro
+
+**Carteira** (`Portfolio`):
+As listas de Fornecedores, Categorias e Centros de Distribuição que um usuário pode enxergar; cada lista vale "todos" ou itens específicos. Definida pelo Administrador ao cadastrar o usuário.
+_Avoid_: Escopo, Permissão, Acesso
+
+### Catálogo
+
+**Categoria** (`Category`):
+Uma classificação, sem hierarquia, que o Owner dá aos Produtos e aos Pedidos de Compra; é por ela que a Carteira filtra os Pedidos de Compra.
+_Avoid_: Departamento, Seção, Família, Grupo
+
+**Produto** (`Product`):
+Uma mercadoria do catálogo do Owner, sempre com uma unidade de medida, que aparece nos itens dos Pedidos de Compra.
+_Avoid_: Item, SKU, Material, Mercadoria
 
 ### Pedido de Compra
 
-**Pedido de Compra** (`PurchaseOrder`):
-Uma compra emitida pelo Owner a um Fornecedor, cuja mercadoria será entregue em um Centro de Distribuição.
+**Pedido de Compra** (`Order`):
+Uma compra de uma Categoria, emitida pelo Owner a um Fornecedor, cuja mercadoria será entregue em um Centro de Distribuição.
 _Avoid_: Pedido, Ordem, PO, Ordem de Recebimento
 
 **Saldo** (`RemainingQuantity`):
