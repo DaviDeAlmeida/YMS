@@ -6,7 +6,7 @@ Requires the .NET 10 SDK.
 
 ```sh
 dotnet test                      # HTTP-level tests (WebApplicationFactory)
-dotnet run --project src/YMS.Api # http://localhost:5230, OpenAPI at /openapi/v1.json
+dotnet run --project src/YMS.Api # http://localhost:5230, Swagger UI at /swagger (document: /swagger/v1/swagger.json)
 ```
 
 In Development every request is signed in as the seeded Owner from `Development:OwnerId` (`appsettings.Development.json`); authentication proper belongs to a later spec. The MediatR license key is read from `MediatR:LicenseKey` (user secrets or environment), never committed.

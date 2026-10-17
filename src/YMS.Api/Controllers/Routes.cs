@@ -1,4 +1,4 @@
-namespace YMS.Api.Endpoints;
+namespace YMS.Api.Controllers;
 
 public static class Routes
 {

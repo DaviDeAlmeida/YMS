@@ -38,4 +38,13 @@ public static class Problems
         Detail = "Um ou mais campos são inválidos.",
         Extensions = { ["errors"] = FieldErrors.GroupByField(errors) },
     };
+
+    public static ProblemDetails BadRequest(IReadOnlyList<FieldError> errors) => new()
+    {
+        Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+        Status = StatusCodes.Status400BadRequest,
+        Title = "A requisição não pôde ser lida.",
+        Detail = "O corpo da requisição está ausente ou malformado.",
+        Extensions = { ["errors"] = FieldErrors.GroupByField(errors) },
+    };
 }
