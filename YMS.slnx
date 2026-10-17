@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/YMS.Api/YMS.Api.csproj" />
+    <Project Path="src/YMS.Application/YMS.Application.csproj" />
+    <Project Path="src/YMS.Domain/YMS.Domain.csproj" />
+    <Project Path="src/YMS.Infrastructure/YMS.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/YMS.Api.Tests/YMS.Api.Tests.csproj" />
+  </Folder>
+</Solution>
