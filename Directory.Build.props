@@ -1,0 +1,8 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- A warning fails the build, locally and in CI. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>
