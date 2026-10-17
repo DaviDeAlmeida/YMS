@@ -3,7 +3,6 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using YMS.Application.Common;
-using YMS.Domain.Owners;
 
 namespace YMS.Api.Auth;
 

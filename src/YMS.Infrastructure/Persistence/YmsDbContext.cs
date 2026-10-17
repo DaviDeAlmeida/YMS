@@ -19,6 +19,9 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
 
     public const string ConnectionStringName = "Yms";
 
+    // Enums are stored by name; the longest name is well under this.
+    private const int MaxEnumLength = 20;
+
     /// <summary>PostgreSQL with snake_case columns; shared by the application and the design-time factory used by migrations.</summary>
     public static DbContextOptionsBuilder Configure(DbContextOptionsBuilder options, string connectionString) =>
         options
@@ -45,7 +48,7 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
             owner.ToTable("owners");
             owner.HasKey(o => o.Id);
             owner.Property(o => o.Id).ValueGeneratedNever();
-            owner.Property(o => o.Name).HasMaxLength(200).IsRequired();
+            owner.Property(o => o.Name).HasMaxLength(Limits.Name).IsRequired();
         });
 
         modelBuilder.Entity<Category>(category =>
@@ -67,15 +70,16 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
             product.Property(p => p.Id).ValueGeneratedNever();
             product.Property(p => p.ExternalId).HasMaxLength(Limits.ExternalId).IsRequired();
             product.Property(p => p.Description).HasMaxLength(Limits.Description).IsRequired();
-            product.Property(p => p.UnitOfMeasure).HasMaxLength(10).IsRequired();
+            product.Property(p => p.UnitOfMeasure).HasMaxLength(Product.MaxUnitOfMeasureLength).IsRequired();
             product.HasOne<Owner>().WithMany().HasForeignKey(p => p.OwnerId);
             product.HasOne(p => p.Category).WithMany().HasForeignKey(p => p.CategoryId);
             product.HasIndex(p => new { p.OwnerId, p.ExternalId }).IsUnique();
             product.OwnsMany(p => p.Eans, ean =>
             {
                 ean.ToTable("product_eans");
-                ean.WithOwner().HasForeignKey("ProductId");
-                ean.Property<int>("Id");
+                // The Owner travels in the key to the Product, so an EAN can only belong to a Product of its own Owner.
+                ean.WithOwner().HasForeignKey("OwnerId", "ProductId").HasPrincipalKey(p => new { p.OwnerId, p.Id });
+                ean.Property<Guid>("Id").HasValueGenerator<GuidV7ValueGenerator>();
                 ean.HasKey("Id");
                 ean.Property(e => e.Value).IsRequired();
             });
@@ -90,7 +94,7 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
             supplier.Property(s => s.Id).ValueGeneratedNever();
             supplier.Property(s => s.ExternalId).HasMaxLength(Limits.ExternalId).IsRequired();
             supplier.Property(s => s.Name).HasMaxLength(Limits.Name).IsRequired();
-            supplier.Property(s => s.Cnpj).HasMaxLength(14).IsRequired();
+            supplier.Property(s => s.Cnpj).HasMaxLength(Cnpj.Length).IsRequired();
             supplier.HasOne<Owner>().WithMany().HasForeignKey(s => s.OwnerId);
             supplier.HasIndex(s => new { s.OwnerId, s.ExternalId }).IsUnique();
             supplier.HasIndex(s => new { s.OwnerId, s.Cnpj });
@@ -99,7 +103,7 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
                 address.Property(a => a.Country).HasMaxLength(Limits.Country).IsRequired();
                 address.Property(a => a.State).HasMaxLength(Limits.AddressPart).IsRequired();
                 address.Property(a => a.City).HasMaxLength(Limits.AddressPart).IsRequired();
-                address.Property(a => a.Street).HasMaxLength(Limits.Description).IsRequired();
+                address.Property(a => a.Street).HasMaxLength(Limits.Street).IsRequired();
                 address.Property(a => a.Number).HasMaxLength(Limits.AddressNumber);
                 address.Property(a => a.Complement).HasMaxLength(Limits.AddressPart);
                 address.Property(a => a.District).HasMaxLength(Limits.AddressPart);
@@ -114,11 +118,13 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
             batch.ToTable("batches");
             batch.HasKey(b => b.Id);
             batch.Property(b => b.Id).ValueGeneratedNever();
-            batch.Property(b => b.Type).HasConversion<string>().HasMaxLength(20);
-            batch.Property(b => b.Status).HasConversion<string>().HasMaxLength(20);
+            batch.Property(b => b.Type).HasConversion<string>().HasMaxLength(MaxEnumLength);
+            batch.Property(b => b.Status).HasConversion<string>().HasMaxLength(MaxEnumLength);
             batch.HasOne<Owner>().WithMany().HasForeignKey(b => b.OwnerId);
             batch.HasIndex(b => new { b.Status, b.ReceivedAt });
-            batch.HasMany(b => b.Items).WithOne().HasForeignKey(i => i.BatchId);
+            batch.HasMany(b => b.Items).WithOne()
+                .HasForeignKey(i => new { i.OwnerId, i.BatchId })
+                .HasPrincipalKey(b => new { b.OwnerId, b.Id });
             batch.Navigation(b => b.Items).UsePropertyAccessMode(PropertyAccessMode.Field);
             batch.HasQueryFilter(b => b.OwnerId == CurrentOwnerId);
         });
@@ -129,15 +135,15 @@ public sealed class YmsDbContext(DbContextOptions<YmsDbContext> options, IOwnerC
             item.HasKey(i => i.Id);
             item.Property(i => i.Id).ValueGeneratedNever();
             item.HasIndex(i => new { i.BatchId, i.Position }).IsUnique();
-            item.Property(i => i.ExternalId).HasMaxLength(BatchItem.MaxExternalIdLength);
+            item.Property(i => i.ExternalId).HasMaxLength(Limits.ExternalId);
             item.Property(i => i.Payload).IsRequired();
-            item.Property(i => i.Result).HasConversion<string>().HasMaxLength(20);
+            item.Property(i => i.Result).HasConversion<string>().HasMaxLength(MaxEnumLength);
             item.Ignore(i => i.IsPending);
             item.OwnsMany(i => i.Errors, error =>
             {
                 error.ToTable("batch_item_errors");
-                error.WithOwner().HasForeignKey("BatchItemId");
-                error.Property<int>("Id");
+                error.WithOwner().HasForeignKey("OwnerId", "BatchItemId").HasPrincipalKey(i => new { i.OwnerId, i.Id });
+                error.Property<Guid>("Id").HasValueGenerator<GuidV7ValueGenerator>();
                 error.HasKey("Id");
             });
             item.Navigation(i => i.Errors).UsePropertyAccessMode(PropertyAccessMode.Field);

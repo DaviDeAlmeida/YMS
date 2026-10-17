@@ -7,6 +7,7 @@ public static class Limits
     public const int Description = 200;
     public const int Name = 200;
     public const int Country = 2;
+    public const int Street = 200;
     public const int AddressPart = 100;
     public const int AddressNumber = 20;
     public const int ZipCode = 20;

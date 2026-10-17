@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using YMS.Application.Batches;
 using YMS.Application.Batches.Queries.GetBatch;
 
 namespace YMS.Api.Controllers;

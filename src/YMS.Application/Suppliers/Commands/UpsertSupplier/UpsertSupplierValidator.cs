@@ -31,7 +31,7 @@ public sealed class AddressInputValidator : AbstractValidator<AddressInput>
         RuleFor(a => a.Country).RequiredText("supplier.address_country", Limits.Country);
         RuleFor(a => a.State).RequiredText("supplier.address_state", Limits.AddressPart);
         RuleFor(a => a.City).RequiredText("supplier.address_city", Limits.AddressPart);
-        RuleFor(a => a.Street).RequiredText("supplier.address_street", Limits.Description);
+        RuleFor(a => a.Street).RequiredText("supplier.address_street", Limits.Street);
         RuleFor(a => a.Number).OptionalText("supplier.address_number", Limits.AddressNumber);
         RuleFor(a => a.Complement).OptionalText("supplier.address_complement", Limits.AddressPart);
         RuleFor(a => a.District).OptionalText("supplier.address_district", Limits.AddressPart);

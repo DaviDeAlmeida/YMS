@@ -1,25 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using YMS.Application.Common;
-using YMS.Domain.Batches;
 
 namespace YMS.Application.Batches.Queries.GetBatch;
 
 public sealed record GetBatchQuery(Guid Id) : IRequest<BatchResponse?>;
-
-public sealed record BatchResponse(
-    Guid Id,
-    BatchType Type,
-    BatchStatus Status,
-    DateTimeOffset ReceivedAt,
-    DateTimeOffset? CompletedAt,
-    IReadOnlyList<BatchItemResponse> Items);
-
-public sealed record BatchItemResponse(
-    int Position,
-    string? ExternalId,
-    BatchItemResult Result,
-    IReadOnlyDictionary<string, ErrorEntry[]> Errors);
 
 public sealed class GetBatchHandler(IYmsDbContext db) : IRequestHandler<GetBatchQuery, BatchResponse?>
 {

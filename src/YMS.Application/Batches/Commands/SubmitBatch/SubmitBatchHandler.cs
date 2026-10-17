@@ -30,10 +30,12 @@ public sealed class SubmitBatchHandler(
         return batch.Id;
     }
 
+    // Only a reference for the ERP: an oversized externalId is cut here and rejected by the item's own validation.
     private static string? ExternalIdOf(JsonElement item) =>
         item.ValueKind == JsonValueKind.Object
         && item.TryGetProperty("externalId", out var externalId)
         && externalId.ValueKind == JsonValueKind.String
-            ? externalId.GetString()
+        && externalId.GetString() is { } value
+            ? value.Length > Limits.ExternalId ? value[..Limits.ExternalId] : value
             : null;
 }

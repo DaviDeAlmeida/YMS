@@ -1,4 +1,4 @@
-namespace YMS.Domain.Owners;
+namespace YMS.Api.Auth;
 
 public static class OwnerClaims
 {

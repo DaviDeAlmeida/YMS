@@ -3,6 +3,9 @@ namespace YMS.Domain.Suppliers;
 /// <summary>Brazilian company registry number (14 digits, the last two being check digits).</summary>
 public static class Cnpj
 {
+    /// <summary>Digits of a CNPJ without its mask.</summary>
+    public const int Length = 14;
+
     private static readonly int[] FirstWeights = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
     private static readonly int[] SecondWeights = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
@@ -17,7 +20,7 @@ public static class Cnpj
             return false;
 
         var digits = Normalize(value);
-        if (digits.Length != 14 || !digits.All(char.IsAsciiDigit) || digits.Distinct().Count() == 1)
+        if (digits.Length != Length || !digits.All(char.IsAsciiDigit) || digits.Distinct().Count() == 1)
             return false;
 
         return CheckDigit(digits, FirstWeights) == digits[12] - '0'

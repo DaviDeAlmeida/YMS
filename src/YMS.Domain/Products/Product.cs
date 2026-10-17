@@ -8,6 +8,8 @@ public sealed class Product : Entity
     /// <summary>The only unit of measure for now; recorded and returned, but not part of the input contract.</summary>
     public const string DefaultUnitOfMeasure = "UN";
 
+    public const int MaxUnitOfMeasureLength = 10;
+
     private readonly List<Ean> _eans = [];
 
     public Guid OwnerId { get; private set; }

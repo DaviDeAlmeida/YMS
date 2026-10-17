@@ -50,7 +50,7 @@ public sealed class Batch
             throw new DomainException("items", "batch.too_many_items", $"O Lote pode ter no máximo {MaxItems} itens.");
 
         var batch = new Batch { OwnerId = ownerId, Type = type, Status = BatchStatus.Received, ReceivedAt = now };
-        batch._items.AddRange(items.Select((item, position) => new BatchItem(batch.Id, position, item.ExternalId, item.Payload)));
+        batch._items.AddRange(items.Select((item, position) => new BatchItem(ownerId, batch.Id, position, item.ExternalId, item.Payload)));
         return batch;
     }
 
@@ -75,6 +75,7 @@ public sealed class BatchItem
     private readonly List<BatchItemError> _errors = [];
 
     public Guid Id { get; private set; } = Guid.CreateVersion7();
+    public Guid OwnerId { get; private set; }
     public Guid BatchId { get; private set; }
 
     /// <summary>Zero-based index of the item in the <c>items</c> array that was sent.</summary>
@@ -90,16 +91,14 @@ public sealed class BatchItem
 
     private BatchItem() { }
 
-    internal BatchItem(Guid batchId, int position, string? externalId, string payload)
+    internal BatchItem(Guid ownerId, Guid batchId, int position, string? externalId, string payload)
     {
+        OwnerId = ownerId;
         BatchId = batchId;
         Position = position;
-        // Only a reference for the ERP: an oversized externalId is cut here and rejected by the item's own validation.
-        ExternalId = externalId is { Length: > MaxExternalIdLength } ? externalId[..MaxExternalIdLength] : externalId;
+        ExternalId = externalId;
         Payload = payload;
     }
-
-    public const int MaxExternalIdLength = 50;
 
     public bool IsPending => Result == BatchItemResult.Pending;
 

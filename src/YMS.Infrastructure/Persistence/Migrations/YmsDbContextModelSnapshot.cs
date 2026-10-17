@@ -55,8 +55,8 @@ namespace YMS.Infrastructure.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_batches");
 
-                    b.HasIndex("OwnerId")
-                        .HasDatabaseName("ix_batches_owner_id");
+                    b.HasAlternateKey("OwnerId", "Id")
+                        .HasName("ak_batches_owner_id_id");
 
                     b.HasIndex("Status", "ReceivedAt")
                         .HasDatabaseName("ix_batches_status_received_at");
@@ -79,6 +79,10 @@ namespace YMS.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("external_id");
 
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owner_id");
+
                     b.Property<string>("Payload")
                         .IsRequired()
                         .HasColumnType("text")
@@ -97,9 +101,15 @@ namespace YMS.Infrastructure.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_batch_items");
 
+                    b.HasAlternateKey("OwnerId", "Id")
+                        .HasName("ak_batch_items_owner_id_id");
+
                     b.HasIndex("BatchId", "Position")
                         .IsUnique()
                         .HasDatabaseName("ix_batch_items_batch_id_position");
+
+                    b.HasIndex("OwnerId", "BatchId")
+                        .HasDatabaseName("ix_batch_items_owner_id_batch_id");
 
                     b.ToTable("batch_items", (string)null);
                 });
@@ -213,6 +223,9 @@ namespace YMS.Infrastructure.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_products");
 
+                    b.HasAlternateKey("OwnerId", "Id")
+                        .HasName("ak_products_owner_id_id");
+
                     b.HasIndex("CategoryId")
                         .HasDatabaseName("ix_products_category_id");
 
@@ -286,19 +299,18 @@ namespace YMS.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("YMS.Domain.Batches.Batch", null)
                         .WithMany("Items")
-                        .HasForeignKey("BatchId")
+                        .HasForeignKey("OwnerId", "BatchId")
+                        .HasPrincipalKey("OwnerId", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_batch_items_batches_batch_id");
+                        .HasConstraintName("fk_batch_items_batches_owner_id_batch_id");
 
                     b.OwnsMany("YMS.Domain.Batches.BatchItemError", "Errors", b1 =>
                         {
-                            b1.Property<int>("Id")
+                            b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
+                                .HasColumnType("uuid")
                                 .HasColumnName("id");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<Guid>("BatchItemId")
                                 .HasColumnType("uuid")
@@ -319,17 +331,22 @@ namespace YMS.Infrastructure.Persistence.Migrations
                                 .HasColumnType("text")
                                 .HasColumnName("message");
 
+                            b1.Property<Guid>("OwnerId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("owner_id");
+
                             b1.HasKey("Id")
                                 .HasName("pk_batch_item_errors");
 
-                            b1.HasIndex("BatchItemId")
-                                .HasDatabaseName("ix_batch_item_errors_batch_item_id");
+                            b1.HasIndex("OwnerId", "BatchItemId")
+                                .HasDatabaseName("ix_batch_item_errors_owner_id_batch_item_id");
 
                             b1.ToTable("batch_item_errors", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("BatchItemId")
-                                .HasConstraintName("fk_batch_item_errors_batch_items_batch_item_id");
+                                .HasForeignKey("OwnerId", "BatchItemId")
+                                .HasPrincipalKey("OwnerId", "Id")
+                                .HasConstraintName("fk_batch_item_errors_batch_items_owner_id_batch_item_id");
                         });
 
                     b.Navigation("Errors");
@@ -363,16 +380,18 @@ namespace YMS.Infrastructure.Persistence.Migrations
 
                     b.OwnsMany("YMS.Domain.Products.Ean", "Eans", b1 =>
                         {
-                            b1.Property<int>("Id")
+                            b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
+                                .HasColumnType("uuid")
                                 .HasColumnName("id");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<bool>("IsPrimary")
                                 .HasColumnType("boolean")
                                 .HasColumnName("is_primary");
+
+                            b1.Property<Guid>("OwnerId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("owner_id");
 
                             b1.Property<Guid>("ProductId")
                                 .HasColumnType("uuid")
@@ -386,14 +405,15 @@ namespace YMS.Infrastructure.Persistence.Migrations
                             b1.HasKey("Id")
                                 .HasName("pk_product_eans");
 
-                            b1.HasIndex("ProductId")
-                                .HasDatabaseName("ix_product_eans_product_id");
+                            b1.HasIndex("OwnerId", "ProductId")
+                                .HasDatabaseName("ix_product_eans_owner_id_product_id");
 
                             b1.ToTable("product_eans", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("ProductId")
-                                .HasConstraintName("fk_product_eans_products_product_id");
+                                .HasForeignKey("OwnerId", "ProductId")
+                                .HasPrincipalKey("OwnerId", "Id")
+                                .HasConstraintName("fk_product_eans_products_owner_id_product_id");
                         });
 
                     b.Navigation("Category");

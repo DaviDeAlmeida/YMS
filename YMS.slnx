@@ -7,5 +7,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/YMS.Api.Tests/YMS.Api.Tests.csproj" />
+    <Project Path="tests/YMS.Architecture.Tests/YMS.Architecture.Tests.csproj" />
   </Folder>
 </Solution>
