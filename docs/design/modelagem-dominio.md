@@ -92,7 +92,7 @@ Iniciada em 2026-10-07. Última atualização em 2026-10-16.
   - Referências e unicidade, que consultam o banco: validator assíncrono do FluentValidation na `YMS.Application`.
   - Invariantes do agregado (quantidade abaixo do agendado, reenvio de Pedido Cancelado): método do agregado na `YMS.Domain`, que lança uma exceção de domínio; a API a converte em `422`, no mesmo formato.
 - **CQRS com pastas separadas** para Commands e Queries: área → `Commands` ou `Queries` → uma pasta por caso de uso (Command, Handler e Validator juntos).
-- **Todo o código é em inglês**: projetos, pastas, classes, rotas e campos do contrato. Os nomes do domínio seguem a coluna em inglês do `GLOSSARY.md`.
+- **Todo o código é em inglês**: projetos, pastas, classes, rotas e campos do contrato. Os nomes do domínio seguem a coluna em inglês do `GLOSSARY.md`. Exceção: os comentários que viram documentação do Swagger são em português ([ADR 0001](../adr/0001-controllers-com-swagger.md)).
 - **Campos da integração** (nomes do contrato da API):
   - Categoria: `externalId`, `description`, `createdAt`, `updatedAt`.
   - Produto: os mesmos da Categoria, mais `categoryExternalId` (a Categoria do Produto) e `eans`, uma lista de `{ value, isPrimary }` com pelo menos um EAN e exatamente um `isPrimary = true`; se a lista tiver um EAN só, ele vira o principal (S18.1).
